@@ -11,7 +11,16 @@ if (!isset($_SESSION['servicios'])) {
 function incrementarVersion() {
     $_SESSION['numero_version']++;
 }
-
+// ===== APARTADO 7: Eliminar servicio =====
+if ($accion === 'eliminar' && isset($_GET['indice'])) {
+    $indice = (int)$_GET['indice'];
+    if (isset($_SESSION['servicios'][$indice])) {
+        array_splice($_SESSION['servicios'], $indice, 1);
+        incrementarVersion();
+    }
+    header('Location: ' . $_SERVER['PHP_SELF']);
+    exit;
+}
 
 // ===== APARTADO 6: Añadir servicio con validación =====
 $errores = [];
@@ -97,6 +106,18 @@ $neto = $base + $iva;
         <th>Acciones</th>
     </tr>
     </thead>
+    <tbody>
+    <?php foreach ($_SESSION['servicios'] as $indice => $s): ?>
+        <tr>
+
+            <!-- ===== APARTADO 7: Enlace eliminar ===== -->
+            <td>
+                <a href="?accion=eliminar&indice=<?= $indice ?>" onclick="return confirm('¿Eliminar este servicio?');">Eliminar</a>
+            </td>
+        </tr>
+    <?php endforeach; ?>
+    </tbody>
+
 
 </table>
 
