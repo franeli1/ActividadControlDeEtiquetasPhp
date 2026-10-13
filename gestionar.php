@@ -32,6 +32,22 @@ if ($accion === 'eliminar' && isset($_GET['indice'])) {
     exit;
 }
 
+// ===== APARTADO 9: Modificar unidades (+/-) =====
+if ($accion === 'modificar_unidades' && isset($_GET['indice']) && isset($_GET['delta'])) {
+    $indice = (int)$_GET['indice'];
+    $delta = (int)$_GET['delta'];
+    if (isset($_SESSION['servicios'][$indice])) {
+        $nuevas = $_SESSION['servicios'][$indice]['unidades'] + $delta;
+        if ($nuevas >= 1) {
+            $_SESSION['servicios'][$indice]['unidades'] = $nuevas;
+            incrementarVersion();
+        }
+    }
+    header('Location: ' . $_SERVER['PHP_SELF']);
+    exit;
+}
+
+
 // ===== APARTADO 6: Añadir servicio con validación =====
 $errores = [];
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $accion === 'anadir') {
@@ -119,6 +135,17 @@ $neto = $base + $iva;
     <tbody>
     <?php foreach ($_SESSION['servicios'] as $indice => $s): ?>
         <tr>
+
+            <!-- ===== APARTADO 9: Botones + y - ===== -->
+            <td>
+                <a href="?accion=modificar_unidades&indice=<?= $indice ?>&delta=-1">−</a>
+                <?= $s['unidades'] ?>
+                <a href="?accion=modificar_unidades&indice=<?= $indice ?>&delta=1">+</a>
+            </td>
+            <td><?= htmlspecialchars($s['codigo']) ?></td>
+            <td><?= htmlspecialchars($s['descripcion']) ?></td>
+            <td><?= number_format($s['precio_unidad'], 2, ',', '.') ?> €</td>
+            <td><?= number_format($s['unidades'] * $s['precio_unidad'], 2, ',', '.') ?> €</td>
 
             <!-- ===== APARTADO 7: Enlace eliminar ===== -->
             <td>
